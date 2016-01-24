@@ -241,6 +241,14 @@ int sycSSL_set_cipher_list(SSL *ssl, const char *str) {
    return result;
 }
 
+long sycSSL_set_tlsext_host_name(SSL *ssl, const char *str) {
+   int result;
+   Debug2("SSL_set_tlsext_host_name(%p, \"%s\")", ssl, str);
+   result = SSL_set_tlsext_host_name(ssl, str);
+   Debug1("SSL_set_tlsext_host_name() -> %lx", result);
+   return result;
+}
+
 long sycSSL_get_verify_result(SSL *ssl) {
    long result;
    Debug1("SSL_get_verify_result(%p)", ssl);

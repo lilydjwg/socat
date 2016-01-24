@@ -190,6 +190,7 @@ const struct optdesc opt_openssl_compress    = { "openssl-compress",   "compress
 const struct optdesc opt_openssl_fips        = { "openssl-fips",       "fips",   OPT_OPENSSL_FIPS,        GROUP_OPENSSL, PH_SPEC, TYPE_BOOL,     OFUNC_SPEC };
 #endif
 const struct optdesc opt_openssl_commonname  = { "openssl-commonname", "cn",     OPT_OPENSSL_COMMONNAME,  GROUP_OPENSSL, PH_SPEC, TYPE_STRING,   OFUNC_SPEC };
+const struct optdesc opt_openssl_servername  = { "openssl-servername", "servername", OPT_OPENSSL_SERVERNAME, GROUP_OPENSSL, PH_SPEC, TYPE_STRING, OFUNC_SPEC };
 
 
 /* If FIPS is compiled in, we need to track if the user asked for FIPS mode.
@@ -271,6 +272,7 @@ static int
    bool opt_ver = true;	/* verify peer certificate */
    char *opt_cert = NULL;	/* file name of client certificate */
    const char *opt_commonname = NULL;	/* for checking peer certificate */
+   char *opt_servername = NULL;   /* server's hostname to send for SNI */
    int result;
 
    if (!(xioflags & XIO_MAYCONVERT)) {
@@ -303,9 +305,14 @@ static int
 
       retropt_string(opts, OPT_OPENSSL_CERTIFICATE, &opt_cert);
       retropt_string(opts, OPT_OPENSSL_COMMONNAME, (char **)&opt_commonname);
+      retropt_string(opts, OPT_OPENSSL_SERVERNAME, &opt_servername);
    
       if (opt_commonname == NULL) {
 	 opt_commonname = hostname;
+      }
+
+      if (opt_servername == NULL) {
+	 opt_servername = hostname;
       }
 
       result =
@@ -334,6 +341,7 @@ static int
       retropt_bool(opts, OPT_FORK, &dofork);
       retropt_string(opts, OPT_OPENSSL_CERTIFICATE, &opt_cert);
       retropt_string(opts, OPT_OPENSSL_COMMONNAME, (char **)&opt_commonname);
+      retropt_string(opts, OPT_OPENSSL_SERVERNAME, &opt_servername);
 
       result =
 	 _xioopen_openssl_prepare(opts, xfd, false, &opt_ver, opt_cert,
@@ -398,7 +406,9 @@ static int
        }
 
        result =
-	  _xioopen_openssl_connect(xfd, opt_ver, opt_commonname, xfd->para.openssl.ctx, level);
+	  _xioopen_openssl_connect(xfd, opt_ver,
+              opt_commonname, opt_servername,
+              xfd->para.openssl.ctx, level);
        switch (result) {
        case STAT_OK: break;
  #if WITH_RETRY
@@ -469,7 +479,8 @@ static int
     SSL connection from an FD and a CTX. */
  int _xioopen_openssl_connect(struct single *xfd,
 			     bool opt_ver,
-			      const char *opt_commonname,
+			     const char *opt_commonname,
+			     const char *opt_servername,
 			     SSL_CTX *ctx,
 			     int level) {
    SSL *ssl;
@@ -484,6 +495,9 @@ static int
       }
       /*Error("SSL_new()");*/
       return STAT_RETRYLATER;
+   }
+   if (opt_servername) {
+      sycSSL_set_tlsext_host_name(ssl, opt_servername);
    }
    xfd->para.openssl.ssl = ssl;
 
@@ -876,7 +890,7 @@ int
    retropt_string(opts, OPT_OPENSSL_KEY, &opt_key);
    retropt_string(opts, OPT_OPENSSL_DHPARAM, &opt_dhparam);
    retropt_string(opts, OPT_OPENSSL_EGD, &opt_egd);
-   retropt_bool(opts,OPT_OPENSSL_PSEUDO, &opt_pseudo);
+   retropt_bool(opts, OPT_OPENSSL_PSEUDO, &opt_pseudo);
 #if OPENSSL_VERSION_NUMBER >= 0x00908000L
    retropt_string(opts, OPT_OPENSSL_COMPRESS, &opt_compress);
 #endif

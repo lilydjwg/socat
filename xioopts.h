@@ -487,6 +487,7 @@ enum e_optcode {
    OPT_OPENSSL_KEY,
    OPT_OPENSSL_METHOD,
    OPT_OPENSSL_PSEUDO,
+   OPT_OPENSSL_SERVERNAME,
    OPT_OPENSSL_VERIFY,
    OPT_OPOST,		/* termios.c_oflag */
    OPT_OSPEED,		/* termios.c_ospeed */

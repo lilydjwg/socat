@@ -36,6 +36,7 @@ void sycSSL_CTX_set_verify(SSL_CTX *ctx, int mode,
 int sycSSL_CTX_set_tmp_dh(SSL_CTX *ctx, DH *dh);
 int sycSSL_CTX_set_cipher_list(SSL_CTX *ctx, const char *str);
 int sycSSL_set_cipher_list(SSL *ssl, const char *str);
+long sycSSL_set_tlsext_host_name(SSL *ctx, const char *servername);
 long sycSSL_get_verify_result(SSL *ssl);
 int sycSSL_set_fd(SSL *ssl, int fd);
 int sycSSL_set_rfd(SSL *ssl, int fd);
@@ -89,6 +90,7 @@ const char *sycSSL_COMP_get_name(const COMP_METHOD *comp);
 #define sycSSL_CTX_set_tmp_dh(c,d) SSL_CTX_set_tmp_dh(c,d)
 #define sycSSL_CTX_set_cipher_list(c,s) SSL_CTX_set_cipher_list(c,s)
 #define sycSSL_set_cipher_list(s,t) SSL_set_cipher_list(s,t)
+#define sycSSL_set_tlsext_host_name(c,n) SSL_set_tlsext_host_name(c,n)
 #define sycSSL_get_verify_result(s) SSL_get_verify_result(s)
 #define sycSSL_set_fd(s,f) SSL_set_fd(s,f)
 #define sycSSL_set_rfd(s,f) SSL_set_rfd(s,f)

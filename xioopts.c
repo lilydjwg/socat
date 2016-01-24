@@ -1304,6 +1304,7 @@ const struct optname optionnames[] = {
 	IF_ANY    ("seek-end",		&opt_lseek32_end)
 	IF_ANY    ("seek-set",		&opt_lseek32_set)
 #endif
+	IF_OPENSSL("servername",	&opt_openssl_servername)
 	IF_ANY    ("setgid",	&opt_setgid)
 	IF_ANY    ("setgid-early",	&opt_setgid_early)
 	IF_ANY 	  ("setlk",	&opt_f_setlk_wr)
